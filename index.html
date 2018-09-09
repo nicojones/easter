@@ -15,13 +15,14 @@
             #graph {
                 position: relative;
                 width: 100%;
-                height: 200px;
+                height: 300px;
                 overflow: hidden;
+                background-color: #eee;
             }
             #graph .dot {
                 border-style: solid;
                 border-width: 6px;
-                border-color: black;
+                border-color: #aaa;
                 height: 1px;
                 width: 1px;
 
@@ -40,35 +41,42 @@
                 border-color: red !important;
             }
             #graph .dot.first {
-                border-color: grey;
+                border-color: #555;
             }
-            .dot:before {
+            #graph .dot::after {
                 content: "";
                 display: block;
                 position: absolute;
-                border: 0.5px solid black;
+                border: 0.5px solid #aaa;
                 height: 1000px;
                 top: -500px;
+
             }
-            #graph .dot.now:before {
+            #graph .dot.now::after {
                 border: 0.5px solid red !important;
             }
-            #graph .dot.first:before {
-                border-color: grey;
+            #graph .dot.first::after {
+                border-color: #555;
+            }
+
+            #graph .hidden {
+                visibility: hidden;
             }
         </style>
 
         <div ng-controller="EasterController as easter" class="row" ng-cloak>
             <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
-                <h1>When is Easter Sunday?</h1>
-                <label>Enter a year AD
-                    <input class="form-control" ng-model="year" type="number" ng-change="findDay()" autofocus />
-                </label>
-                <br/>
-                <a class="pull-right" ng-hide="maths" href="#" ng-click="showMaths()">show maths</a>
-                <a class="pull-right" ng-show="maths" href="#" ng-click="showMaths()">show explanation</a>
-                <br>
-                <pre ng-show="maths">
+                <div class="col-xs-12">
+                    <h1>When is Easter Sunday?</h1>
+                    <label>Enter a year AD
+                        <input class="form-control" ng-model="year"
+                         type="number" ng-change="findDay()" autofocus="true" />
+                    </label>
+                    <br/>
+                    <a class="pull-right" ng-hide="maths" href="#" ng-click="showMaths()">show maths</a>
+                    <a class="pull-right" ng-show="maths" href="#" ng-click="showMaths()">show explanation</a>
+                    <br>
+                    <pre ng-show="maths">
  1. <b>A</b> is the remainder of YEAR/19: <span ng-bind="a"></span>
  2. <b>B</b> is the quotient of YEAR/100: <span ng-bind="b"></span>
  3. <b>C</b> is the remainder of YEAR/100: <span ng-bind="c"></span>
@@ -97,43 +105,72 @@
  12. Finds month of Easter
  13. Finds day of month for easter</pre>
 
-                <p>Easter Sunday is the <i>P</i>th day of the <i>N</i>th month, where 3 = March and 4 = April.</p>
-                <h3 ng-if="year > 0"> Easter Sunday {{future}} on: <span ng-bind="answer"></span></h3>
+                    <p>Easter Sunday is the <i>P</i>th day of the <i>N</i>th month, where 3 = March and 4 = April.</p>
+                    <h3 ng-if="year > 0"> Easter Sunday {{future}} on: <span ng-bind="answer"></span></h3>
 
-                <ul ng-if="year > 0">
-                    <li>Golden number: A + 1 = <b ng-bind="a + 1"></b></li>
-                    <li>Epact: 23 - H or 53 - H (whichever is positive): <b ng-bind="epact"></b></li>
-                    <li>Dominical Letter: Remainder of 2E + 2J - K divided by 7, then take A = 1, B = 2, etc.: <b ng-bind="dl"></b></li>
-                </ul>
-            </div>
-
-            <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2" ng-if="year">
-                <pre id="graph" ng-if="easterGraph">
-                    <span ng-repeat="day in easterGraph"
-                        ng-class="{now: day.now, dot: 1, first: day.day == 1}"
-                        title="{{day.month}} {{day.day}}, {{day.year}}"
-                            ng-style="{left: day.left + '%', bottom: (2*day.bottom-30) + '%'}">
-                        </span>
-                </pre>
-                <div id="legend" class="col-xs-12">
-                    <small style="position: absolute; left: 0%"  ng-bind="'year ' + (year - 50)"></small>
-                    <small style="position: absolute; left: 48%"  ng-bind="'year ' +year"></small>
-                    <small style="position: absolute; right: 0" ng-bind="'year ' + (year + 50)"></small>
+                    <ul ng-if="year > 0">
+                        <li>Golden number: A + 1 = <b ng-bind="a + 1"></b></li>
+                        <li>Epact: 23 - H or 53 - H (whichever is positive): <b ng-bind="epact"></b></li>
+                        <li>Dominical Letter: Remainder of 2E + 2J - K divided by 7, then take A = 1, B = 2, etc.: <b ng-bind="dl"></b></li>
+                    </ul>
                 </div>
 
-            </div>
-            <br>
-            <br>
-            <br>
-            <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
-                <label>
-                    Gap between years to make music!
-                    <input class="form-control" ng-model="jump" type="number" ng-model="jump" placeholder="jump" />
-                </label>
-                <button class="btn btn-big btn-default" ng-click="play()">play/pause</button>
+                <div class="col-xs-12" ng-if="year">
+                    <pre id="graph" ng-if="easterGraph">
+                        <span ng-repeat="day in easterGraph"
+                            ng-class="{now: day.now, dot: 1, first: day.day == 1, hidden: day.year < 0}"
+                            title="{{day.month}} {{day.day}}, {{day.year}}"
+                                ng-style="{left: day.left + '%', bottom: (2*day.bottom-30) + '%'}">
+                            </span>
+                    </pre>
 
-                <h3 ng-bind="'pitch: ' + playPitch"></h3>
-                <h3 ng-bind=" 'year: ' + playYear "></h3>
+                    <div id="legend" class="col-xs-12" ng-hide="playingNow">
+                        <small style="position: absolute; left: 0%"  ng-bind="year - 50 > 0 ? ('year ' + (year - 50)) : ''"></small>
+                        <small style="position: absolute; left: 48%"  ng-bind="'year ' +year"></small>
+                        <small style="position: absolute; right: 0" ng-bind="'year ' + (year + 50)"></small>
+                    </div>
+
+
+                    <div id="legend-playing" class="col-xs-12" ng-show="playingNow">
+                        <small style="position: absolute; left: 0%"  ng-bind="playYear - 50 > 0 ? ('year ' + (playYear - 50)) : ''"></small>
+                        <small style="position: absolute; left: 48%"  ng-bind="'year ' +playYear"></small>
+                        <small style="position: absolute; right: 0" ng-bind="'year ' + (playYear + 50)"></small>
+                    </div>
+
+                </div>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <hr style="width: 100%"/>
+                <div class="col-xs-12 col-md-6" style="padding-top: 2em;">
+
+                    Gap between years to make music!<br/>
+                    <label class="pull-left">
+                        <input class="form-control" ng-model="jump" type="number" ng-model="jump" placeholder="note every X years" />
+                    </label>
+                    <button class="btn btn-big btn-default pull-left" ng-click="play()">{{ playingNow ? "pause" : "play"}}</button>
+                    <br/>
+                    <br/>
+                    <label class="pull-left" for="highpitch">high pitch? <small>more notes = higher pitch...</small></label>
+                    <input id="highpitch" type="checkbox" value="1" name="highPitch" ng-model="highPitch"/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <ul>
+                        <li>try with a gap of:</li>
+                        <li ng-click="jump = 3" style="cursor:pointer" title="click to set">3 years</li>
+                        <li ng-click="jump = 8" style="cursor:pointer" title="click to set">8 years</li>
+                        <li ng-click="jump = 100" style="cursor:pointer" title="click to set">100 years</li>
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-md-6" style="padding-top: 2em;">
+
+                    <h3 ng-bind="'pitch: ' + Math.round((playPitch || 0), 1) + ' Hz'"> </h3>
+                    <h3 ng-bind=" 'year: ' + (playYear || 0) + ' a.D.'"></h3>
+                </div>
+            
             </div>
         </div>
 
