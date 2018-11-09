@@ -7,4 +7,4 @@ And, as a plus, there's a graph of when do the days fall, and you'll see they fo
 For that reason, I decided to make them able to play a tone, essentially creating the...
 * SYMFONY OF SUNDAYS *
 
-Use it <a href="https://rawgit.com/nicojones/easter/master/index.html" target="_blank">here!</a>
+Use it <a href="https://nicojones.github.io/easter/index.html" target="_blank">here!</a>
